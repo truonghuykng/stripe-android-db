@@ -132,7 +132,7 @@ fun TextField(
     val placeHolder by textFieldController.placeHolder.collectAsState(null)
 
     var hasFocus by rememberSaveable { mutableStateOf(false) }
-    val colors = TextFieldColors(shouldShowError)
+    val colors = textFieldColors(shouldShowError)
     val fieldState by textFieldController.fieldState.collectAsState(
         TextFieldStateConstants.Error.Blank
     )
@@ -289,14 +289,14 @@ fun AnimatedIcons(
         }
     }
 
-    Crossfade(targetState = target) {
+    Crossfade(targetState = target, label = "AnimatedIconsCrossfade") {
         TrailingIcon(it, loading)
     }
 }
 
 @Composable
 @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
-fun TextFieldColors(
+fun textFieldColors(
     shouldShowError: Boolean = false
 ) = TextFieldDefaults.textFieldColors(
     textColor = if (shouldShowError) {
