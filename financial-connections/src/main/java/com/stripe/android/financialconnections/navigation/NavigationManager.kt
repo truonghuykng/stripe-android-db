@@ -30,17 +30,14 @@ internal class NavigationManagerImpl @Inject constructor(
 }
 
 @Suppress("ComplexMethod")
-internal fun Pane.toNavigationCommand(
-    args: Map<String, Any?> = emptyMap()
-): NavigationCommand = when (this) {
+internal fun Pane.toRoute(): NavigationCommand = when (this) {
     Pane.INSTITUTION_PICKER -> NavigationDirections.institutionPicker
     Pane.PARTNER_AUTH -> NavigationDirections.partnerAuth
     Pane.CONSENT -> NavigationDirections.consent
     Pane.ACCOUNT_PICKER -> NavigationDirections.accountPicker
     Pane.SUCCESS -> NavigationDirections.success
     Pane.MANUAL_ENTRY -> NavigationDirections.manualEntry
-    Pane.MANUAL_ENTRY_SUCCESS ->
-        NavigationDirections.ManualEntrySuccess(args)
+    Pane.MANUAL_ENTRY_SUCCESS -> NavigationDirections.ManualEntrySuccess
     Pane.ATTACH_LINKED_PAYMENT_ACCOUNT -> NavigationDirections.attachLinkedPaymentAccount
     Pane.RESET -> NavigationDirections.reset
     Pane.NETWORKING_LINK_SIGNUP_PANE -> NavigationDirections.networkingLinkSignup

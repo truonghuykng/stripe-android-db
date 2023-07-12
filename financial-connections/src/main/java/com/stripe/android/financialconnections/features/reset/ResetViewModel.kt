@@ -16,7 +16,7 @@ import com.stripe.android.financialconnections.domain.NativeAuthFlowCoordinator.
 import com.stripe.android.financialconnections.model.FinancialConnectionsSessionManifest.Pane
 import com.stripe.android.financialconnections.navigation.NavigationManager
 import com.stripe.android.financialconnections.navigation.NavigationState.NavigateToRoute
-import com.stripe.android.financialconnections.navigation.toNavigationCommand
+import com.stripe.android.financialconnections.navigation.toRoute
 import com.stripe.android.financialconnections.ui.FinancialConnectionsSheetNativeActivity
 import javax.inject.Inject
 
@@ -37,7 +37,8 @@ internal class ResetViewModel @Inject constructor(
             eventTracker.track(PaneLoaded(Pane.RESET))
             navigationManager.navigate(
                 NavigateToRoute(
-                    updatedManifest.nextPane.toNavigationCommand(),
+                    command = updatedManifest.nextPane.toRoute(),
+                    referrer = Pane.RESET,
                     popCurrentFromBackStack = true
                 )
             )

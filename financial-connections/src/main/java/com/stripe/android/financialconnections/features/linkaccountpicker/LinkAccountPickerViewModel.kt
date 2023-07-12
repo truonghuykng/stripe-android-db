@@ -23,8 +23,9 @@ import com.stripe.android.financialconnections.features.consent.FinancialConnect
 import com.stripe.android.financialconnections.model.FinancialConnectionsAccount.Status
 import com.stripe.android.financialconnections.model.FinancialConnectionsSessionManifest.Pane
 import com.stripe.android.financialconnections.model.PartnerAccount
-import com.stripe.android.financialconnections.navigation.NavigationDirections
 import com.stripe.android.financialconnections.navigation.NavigationDirections.institutionPicker
+import com.stripe.android.financialconnections.navigation.NavigationDirections.linkStepUpVerification
+import com.stripe.android.financialconnections.navigation.NavigationDirections.success
 import com.stripe.android.financialconnections.navigation.NavigationManager
 import com.stripe.android.financialconnections.navigation.NavigationState.NavigateToRoute
 import com.stripe.android.financialconnections.ui.FinancialConnectionsSheetNativeActivity
@@ -82,7 +83,12 @@ internal class LinkAccountPickerViewModel @Inject constructor(
             onFail = { error ->
                 logger.error("Error fetching payload", error)
                 eventTracker.track(Error(PANE, error))
-                navigationManager.navigate(NavigateToRoute(institutionPicker))
+                navigationManager.navigate(
+                    NavigateToRoute(
+                        command = institutionPicker,
+                        referrer = Pane.LINK_ACCOUNT_PICKER
+                    )
+                )
             },
         )
         onAsync(
@@ -101,7 +107,12 @@ internal class LinkAccountPickerViewModel @Inject constructor(
 
     fun onNewBankAccountClick() = viewModelScope.launch {
         eventTracker.track(Click("click.new_account", PANE))
-        navigationManager.navigate(NavigateToRoute(institutionPicker))
+        navigationManager.navigate(
+            NavigateToRoute(
+                command = institutionPicker,
+                referrer = Pane.LINK_ACCOUNT_PICKER
+            )
+        )
     }
 
     fun onSelectAccountClick() = suspend {
@@ -112,7 +123,12 @@ internal class LinkAccountPickerViewModel @Inject constructor(
         when {
             selectedAccount.status != Status.ACTIVE -> repairAccount()
             payload.stepUpAuthenticationRequired -> {
-                navigationManager.navigate(NavigateToRoute(NavigationDirections.linkStepUpVerification))
+                navigationManager.navigate(
+                    NavigateToRoute(
+                        command = linkStepUpVerification,
+                        referrer = Pane.LINK_ACCOUNT_PICKER
+                    )
+                )
             }
 
             else -> selectAccount(payload, selectedAccount)
@@ -138,7 +154,12 @@ internal class LinkAccountPickerViewModel @Inject constructor(
         // Updates cached accounts with the one selected.
         updateCachedAccounts { listOf(selectedAccount) }
         eventTracker.track(Click("click.link_accounts", PANE))
-        navigationManager.navigate(NavigateToRoute(NavigationDirections.success))
+        navigationManager.navigate(
+            NavigateToRoute(
+                command = success,
+                referrer = Pane.LINK_ACCOUNT_PICKER
+            )
+        )
     }
 
     fun onAccountClick(partnerAccount: PartnerAccount) {

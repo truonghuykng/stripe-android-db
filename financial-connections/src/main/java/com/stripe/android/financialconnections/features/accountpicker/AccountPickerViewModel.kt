@@ -27,7 +27,7 @@ import com.stripe.android.financialconnections.model.PartnerAccountsList
 import com.stripe.android.financialconnections.navigation.NavigationDirections
 import com.stripe.android.financialconnections.navigation.NavigationManager
 import com.stripe.android.financialconnections.navigation.NavigationState.NavigateToRoute
-import com.stripe.android.financialconnections.navigation.toNavigationCommand
+import com.stripe.android.financialconnections.navigation.toRoute
 import com.stripe.android.financialconnections.ui.FinancialConnectionsSheetNativeActivity
 import com.stripe.android.financialconnections.ui.TextResource
 import com.stripe.android.financialconnections.utils.measureTimeMillis
@@ -189,7 +189,10 @@ internal class AccountPickerViewModel @Inject constructor(
                 updateLocalCache = updateLocalCache
             )
             navigationManager.navigate(
-                NavigateToRoute(accountsList.nextPane.toNavigationCommand())
+                NavigateToRoute(
+                    referrer = Pane.ACCOUNT_PICKER,
+                    command = accountsList.nextPane.toRoute()
+                )
             )
             accountsList
         }.execute {
@@ -198,10 +201,20 @@ internal class AccountPickerViewModel @Inject constructor(
     }
 
     fun selectAnotherBank() =
-        navigationManager.navigate(NavigateToRoute(NavigationDirections.reset))
+        navigationManager.navigate(
+            NavigateToRoute(
+                referrer = Pane.ACCOUNT_PICKER,
+                command = NavigationDirections.reset
+            )
+        )
 
     fun onEnterDetailsManually() =
-        navigationManager.navigate(NavigateToRoute(NavigationDirections.manualEntry))
+        navigationManager.navigate(
+            NavigateToRoute(
+                referrer = Pane.ACCOUNT_PICKER,
+                command = NavigationDirections.manualEntry
+            )
+        )
 
     fun onLoadAccountsAgain() {
         setState { copy(canRetry = false) }

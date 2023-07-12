@@ -21,7 +21,7 @@ import com.stripe.android.financialconnections.model.PaymentAccountParams
 import com.stripe.android.financialconnections.navigation.NavigationDirections
 import com.stripe.android.financialconnections.navigation.NavigationManager
 import com.stripe.android.financialconnections.navigation.NavigationState.NavigateToRoute
-import com.stripe.android.financialconnections.navigation.toNavigationCommand
+import com.stripe.android.financialconnections.navigation.toRoute
 import com.stripe.android.financialconnections.repository.SaveToLinkWithStripeSucceededRepository
 import com.stripe.android.financialconnections.ui.FinancialConnectionsSheetNativeActivity
 import com.stripe.android.financialconnections.utils.measureTimeMillis
@@ -65,7 +65,12 @@ internal class AttachPaymentViewModel @Inject constructor(
                     params = PaymentAccountParams.LinkedAccount(requireNotNull(id))
                 ).also {
                     val nextPane = it.nextPane ?: Pane.SUCCESS
-                    navigationManager.navigate(NavigateToRoute(nextPane.toNavigationCommand()))
+                    navigationManager.navigate(
+                        NavigateToRoute(
+                            command = nextPane.toRoute(),
+                            referrer = Pane.ATTACH_LINKED_PAYMENT_ACCOUNT
+                        )
+                    )
                 }
             }
             eventTracker.track(PollAttachPaymentsSucceeded(authSession.id, millis))
@@ -98,10 +103,20 @@ internal class AttachPaymentViewModel @Inject constructor(
     }
 
     fun onEnterDetailsManually() =
-        navigationManager.navigate(NavigateToRoute(NavigationDirections.manualEntry))
+        navigationManager.navigate(
+            NavigateToRoute(
+                referrer = Pane.ATTACH_LINKED_PAYMENT_ACCOUNT,
+                command = NavigationDirections.manualEntry
+            )
+        )
 
     fun onSelectAnotherBank() =
-        navigationManager.navigate(NavigateToRoute(NavigationDirections.reset))
+        navigationManager.navigate(
+            NavigateToRoute(
+                referrer = Pane.ATTACH_LINKED_PAYMENT_ACCOUNT,
+                command = NavigationDirections.reset
+            )
+        )
 
     companion object : MavericksViewModelFactory<AttachPaymentViewModel, AttachPaymentState> {
 

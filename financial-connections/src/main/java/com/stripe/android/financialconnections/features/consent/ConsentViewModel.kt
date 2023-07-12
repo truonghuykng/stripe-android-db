@@ -20,7 +20,7 @@ import com.stripe.android.financialconnections.model.FinancialConnectionsSession
 import com.stripe.android.financialconnections.navigation.NavigationDirections
 import com.stripe.android.financialconnections.navigation.NavigationManager
 import com.stripe.android.financialconnections.navigation.NavigationState.NavigateToRoute
-import com.stripe.android.financialconnections.navigation.toNavigationCommand
+import com.stripe.android.financialconnections.navigation.toRoute
 import com.stripe.android.financialconnections.ui.FinancialConnectionsSheetNativeActivity
 import com.stripe.android.financialconnections.utils.Experiment.CONNECTIONS_CONSENT_COMBINED_LOGO
 import com.stripe.android.financialconnections.utils.UriUtils
@@ -73,7 +73,10 @@ internal class ConsentViewModel @Inject constructor(
             eventTracker.track(ConsentAgree)
             val updatedManifest: FinancialConnectionsSessionManifest = acceptConsent()
             navigationManager.navigate(
-                NavigateToRoute(updatedManifest.nextPane.toNavigationCommand())
+                NavigateToRoute(
+                    command = updatedManifest.nextPane.toRoute(),
+                    referrer = Pane.CONSENT
+                )
             )
         }.execute { copy(acceptConsent = it) }
     }
@@ -103,7 +106,10 @@ internal class ConsentViewModel @Inject constructor(
 
                 ConsentClickableText.MANUAL_ENTRY -> {
                     navigationManager.navigate(
-                        NavigateToRoute(NavigationDirections.manualEntry)
+                        NavigateToRoute(
+                            command = NavigationDirections.manualEntry,
+                            referrer = Pane.CONSENT
+                        )
                     )
                 }
 

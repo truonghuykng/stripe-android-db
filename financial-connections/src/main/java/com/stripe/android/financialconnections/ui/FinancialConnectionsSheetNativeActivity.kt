@@ -49,7 +49,7 @@ import com.stripe.android.financialconnections.model.FinancialConnectionsSession
 import com.stripe.android.financialconnections.navigation.NavigationDirections
 import com.stripe.android.financialconnections.navigation.NavigationManager
 import com.stripe.android.financialconnections.navigation.NavigationState
-import com.stripe.android.financialconnections.navigation.toNavigationCommand
+import com.stripe.android.financialconnections.navigation.toRoute
 import com.stripe.android.financialconnections.presentation.CreateBrowserIntentForUrl
 import com.stripe.android.financialconnections.presentation.FinancialConnectionsSheetNativeViewEffect.Finish
 import com.stripe.android.financialconnections.presentation.FinancialConnectionsSheetNativeViewEffect.OpenUrl
@@ -147,12 +147,7 @@ internal class FinancialConnectionsSheetNativeActivity : AppCompatActivity(), Ma
         val context = LocalContext.current
         val navController = rememberNavController()
         val uriHandler = remember { CustomTabUriHandler(context) }
-        val initialDestination =
-            remember(initialPane) {
-                initialPane.toNavigationCommand(
-                    emptyMap()
-                ).destination
-            }
+        val initialDestination = remember(initialPane) { initialPane.toRoute().destination }
         NavigationEffect(navController)
         CompositionLocalProvider(
             LocalReducedBranding provides reducedBranding,
@@ -161,25 +156,22 @@ internal class FinancialConnectionsSheetNativeActivity : AppCompatActivity(), Ma
             LocalUriHandler provides uriHandler
         ) {
             NavHost(navController, startDestination = initialDestination) {
-                composable(NavigationDirections.consent.destination) {
+                NavigationDirections.consent.composable(this) {
                     LaunchedPane(Pane.CONSENT)
                     BackHandler(navController, Pane.CONSENT)
                     ConsentScreen()
                 }
-                composable(NavigationDirections.manualEntry.destination) {
+                NavigationDirections.manualEntry.composable(this) {
                     LaunchedPane(Pane.MANUAL_ENTRY)
                     BackHandler(navController, Pane.MANUAL_ENTRY)
                     ManualEntryScreen()
                 }
-                composable(
-                    route = NavigationDirections.ManualEntrySuccess.route,
-                    arguments = NavigationDirections.ManualEntrySuccess.arguments
-                ) {
+                NavigationDirections.ManualEntrySuccess.composable(this) {
                     LaunchedPane(Pane.MANUAL_ENTRY_SUCCESS)
                     BackHandler(navController, Pane.MANUAL_ENTRY_SUCCESS)
                     ManualEntrySuccessScreen(it)
                 }
-                composable(NavigationDirections.institutionPicker.destination) {
+                NavigationDirections.institutionPicker.composable(this) {
                     LaunchedPane(Pane.INSTITUTION_PICKER)
                     BackHandler(navController, Pane.INSTITUTION_PICKER)
                     InstitutionPickerScreen()
@@ -296,7 +288,10 @@ internal class FinancialConnectionsSheetNativeActivity : AppCompatActivity(), Ma
         from: String?,
         navController: NavHostController
     ) {
-        val destination = viewState.command.destination
+        val destination = viewState.command(
+            referrer = viewState.referrer,
+            params = viewState.params
+        )
         if (destination.isNotEmpty() && destination != from) {
             logger.debug("Navigating from $from to $destination")
             navController.navigate(destination) {

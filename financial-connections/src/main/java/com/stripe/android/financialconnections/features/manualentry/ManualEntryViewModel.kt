@@ -19,10 +19,10 @@ import com.stripe.android.financialconnections.model.FinancialConnectionsSession
 import com.stripe.android.financialconnections.model.LinkAccountSessionPaymentAccount
 import com.stripe.android.financialconnections.model.ManualEntryMode
 import com.stripe.android.financialconnections.model.PaymentAccountParams
-import com.stripe.android.financialconnections.navigation.NavigationDirections
+import com.stripe.android.financialconnections.navigation.NavigationDirections.ManualEntrySuccess
 import com.stripe.android.financialconnections.navigation.NavigationManager
 import com.stripe.android.financialconnections.navigation.NavigationState
-import com.stripe.android.financialconnections.navigation.toNavigationCommand
+import com.stripe.android.financialconnections.navigation.toRoute
 import com.stripe.android.financialconnections.ui.FinancialConnectionsSheetNativeActivity
 import javax.inject.Inject
 
@@ -135,12 +135,16 @@ internal class ManualEntryViewModel @Inject constructor(
                     accountNumber = requireNotNull(state.account)
                 )
             ).also {
-                val args = NavigationDirections.ManualEntrySuccess.argMap(
-                    microdepositVerificationMethod = it.microdepositVerificationMethod,
-                    last4 = state.account.takeLast(4)
+                navigationManager.navigate(
+                    NavigationState.NavigateToRoute(
+                        command = it.nextPane?.toRoute() ?: ManualEntrySuccess,
+                        params = ManualEntrySuccess.argMap(
+                            microdepositVerificationMethod = it.microdepositVerificationMethod,
+                            last4 = state.account.takeLast(4)
+                        ),
+                        referrer = Pane.MANUAL_ENTRY,
+                    )
                 )
-                val nextPane = (it.nextPane ?: Pane.MANUAL_ENTRY_SUCCESS).toNavigationCommand(args)
-                navigationManager.navigate(NavigationState.NavigateToRoute(nextPane))
             }
         }.execute { copy(linkPaymentAccount = it) }
     }

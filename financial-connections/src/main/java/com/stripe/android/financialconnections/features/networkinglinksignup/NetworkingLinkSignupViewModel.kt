@@ -111,7 +111,12 @@ internal class NetworkingLinkSignupViewModel @Inject constructor(
                 saveToLinkWithStripeSucceeded.set(false)
                 logger.error("Error saving account to Link", error)
                 eventTracker.track(Error(PANE, error))
-                navigationManager.navigate(NavigateToRoute(NavigationDirections.success))
+                navigationManager.navigate(
+                    NavigateToRoute(
+                        command = NavigationDirections.success,
+                        referrer = Pane.NETWORKING_LINK_SIGNUP_PANE
+                    )
+                )
             },
         )
         onAsync(
@@ -119,7 +124,12 @@ internal class NetworkingLinkSignupViewModel @Inject constructor(
             onSuccess = { consumerSession ->
                 if (consumerSession.exists) {
                     eventTracker.track(NetworkingReturningConsumer(PANE))
-                    navigationManager.navigate(NavigateToRoute(networkingSaveToLinkVerification))
+                    navigationManager.navigate(
+                        NavigateToRoute(
+                            command = networkingSaveToLinkVerification,
+                            referrer = Pane.NETWORKING_LINK_SIGNUP_PANE
+                        )
+                    )
                 } else {
                     eventTracker.track(NetworkingNewConsumer(PANE))
                 }
@@ -161,7 +171,12 @@ internal class NetworkingLinkSignupViewModel @Inject constructor(
 
     fun onSkipClick() = viewModelScope.launch {
         eventTracker.track(Click(eventName = "click.not_now", pane = PANE))
-        navigationManager.navigate(NavigateToRoute(NavigationDirections.success))
+        navigationManager.navigate(
+            NavigateToRoute(
+                command = NavigationDirections.success,
+                referrer = Pane.NETWORKING_LINK_SIGNUP_PANE
+            )
+        )
     }
 
     fun onSaveAccount() {
@@ -177,7 +192,12 @@ internal class NetworkingLinkSignupViewModel @Inject constructor(
                 phoneNumber = phoneController.getE164PhoneNumber(state.validPhone!!),
                 selectedAccounts = selectedAccounts.map { it.id },
             ).also {
-                navigationManager.navigate(NavigateToRoute(NavigationDirections.success))
+                navigationManager.navigate(
+                    NavigateToRoute(
+                        command = NavigationDirections.success,
+                        referrer = Pane.NETWORKING_LINK_SIGNUP_PANE
+                    )
+                )
             }
         }.execute { copy(saveAccountToLink = it) }
     }

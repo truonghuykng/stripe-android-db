@@ -20,7 +20,7 @@ import com.stripe.android.financialconnections.model.FinancialConnectionsSession
 import com.stripe.android.financialconnections.navigation.NavigationDirections.networkingLinkVerification
 import com.stripe.android.financialconnections.navigation.NavigationManager
 import com.stripe.android.financialconnections.navigation.NavigationState.NavigateToRoute
-import com.stripe.android.financialconnections.navigation.toNavigationCommand
+import com.stripe.android.financialconnections.navigation.toRoute
 import com.stripe.android.financialconnections.ui.FinancialConnectionsSheetNativeActivity
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -65,7 +65,12 @@ internal class NetworkingLinkLoginWarmupViewModel @Inject constructor(
 
     fun onContinueClick() = viewModelScope.launch {
         eventTracker.track(Click("click.continue", PANE))
-        navigationManager.navigate(NavigateToRoute(networkingLinkVerification))
+        navigationManager.navigate(
+            NavigateToRoute(
+                command = networkingLinkVerification,
+                referrer = Pane.NETWORKING_LINK_LOGIN_WARMUP
+            )
+        )
     }
 
     fun onClickableTextClick(text: String) = when (text) {
@@ -79,7 +84,8 @@ internal class NetworkingLinkLoginWarmupViewModel @Inject constructor(
             disableNetworking().also {
                 navigationManager.navigate(
                     NavigateToRoute(
-                        command = it.nextPane.toNavigationCommand(),
+                        command = it.nextPane.toRoute(),
+                        referrer = Pane.NETWORKING_LINK_LOGIN_WARMUP,
                         // skipping disables networking, which means
                         // we don't want the user to navigate back to
                         // the warm-up pane.

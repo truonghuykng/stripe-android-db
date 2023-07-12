@@ -87,14 +87,24 @@ internal class NetworkingSaveToLinkVerificationViewModel @Inject constructor(
             NetworkingSaveToLinkVerificationState::confirmVerification,
             onSuccess = {
                 saveToLinkWithStripeSucceeded.set(true)
-                navigationManager.navigate(NavigateToRoute(success))
+                navigationManager.navigate(
+                    NavigateToRoute(
+                        command = success,
+                        referrer = Pane.NETWORKING_SAVE_TO_LINK_VERIFICATION
+                    )
+                )
             },
             onFail = { error ->
                 logger.error("Error confirming verification", error)
                 eventTracker.track(Error(PANE, error))
                 if (error !is OTPError) {
                     saveToLinkWithStripeSucceeded.set(false)
-                    navigationManager.navigate(NavigateToRoute(success))
+                    navigationManager.navigate(
+                        NavigateToRoute(
+                            command = success,
+                            referrer = Pane.NETWORKING_SAVE_TO_LINK_VERIFICATION
+                        )
+                    )
                 }
             },
         )
@@ -124,7 +134,12 @@ internal class NetworkingSaveToLinkVerificationViewModel @Inject constructor(
     }.execute { copy(confirmVerification = it) }
 
     fun onSkipClick() {
-        navigationManager.navigate(NavigateToRoute(success))
+        navigationManager.navigate(
+            NavigateToRoute(
+                command = success,
+                referrer = Pane.NETWORKING_SAVE_TO_LINK_VERIFICATION
+            )
+        )
     }
 
     companion object :

@@ -32,7 +32,7 @@ import com.stripe.android.financialconnections.navigation.NavigationDirections.i
 import com.stripe.android.financialconnections.navigation.NavigationDirections.linkAccountPicker
 import com.stripe.android.financialconnections.navigation.NavigationManager
 import com.stripe.android.financialconnections.navigation.NavigationState.NavigateToRoute
-import com.stripe.android.financialconnections.navigation.toNavigationCommand
+import com.stripe.android.financialconnections.navigation.toRoute
 import com.stripe.android.financialconnections.ui.FinancialConnectionsSheetNativeActivity
 import com.stripe.android.model.ConsumerSession
 import com.stripe.android.model.VerificationType
@@ -68,7 +68,12 @@ internal class NetworkingLinkVerificationViewModel @Inject constructor(
                         verificationType = VerificationType.SMS,
                         onConsumerNotFound = {
                             analyticsTracker.track(VerificationError(PANE, ConsumerNotFoundError))
-                            navigationManager.navigate(NavigateToRoute(institutionPicker))
+                            navigationManager.navigate(
+                                NavigateToRoute(
+                                    command = institutionPicker,
+                                    referrer = Pane.NETWORKING_LINK_VERIFICATION
+                                )
+                            )
                         },
                         onLookupError = { error ->
                             analyticsTracker.track(VerificationError(PANE, LookupConsumerSession))
@@ -137,7 +142,12 @@ internal class NetworkingLinkVerificationViewModel @Inject constructor(
         logger.error("Error fetching networked accounts", error)
         analyticsTracker.track(Error(PANE, error))
         analyticsTracker.track(VerificationError(PANE, NetworkedAccountsRetrieveMethodError))
-        navigationManager.navigate(NavigateToRoute(updatedManifest.nextPane.toNavigationCommand()))
+        navigationManager.navigate(
+            NavigateToRoute(
+                command = updatedManifest.nextPane.toRoute(),
+                referrer = Pane.NETWORKING_LINK_VERIFICATION
+            )
+        )
     }
 
     private suspend fun onNetworkedAccountsSuccess(
@@ -147,11 +157,21 @@ internal class NetworkingLinkVerificationViewModel @Inject constructor(
         if (accounts.data.isEmpty()) {
             // Networked user has no accounts
             analyticsTracker.track(VerificationSuccessNoAccounts(PANE))
-            navigationManager.navigate(NavigateToRoute(updatedManifest.nextPane.toNavigationCommand()))
+            navigationManager.navigate(
+                NavigateToRoute(
+                    command = updatedManifest.nextPane.toRoute(),
+                    referrer = Pane.NETWORKING_LINK_VERIFICATION
+                )
+            )
         } else {
             // Networked user has linked accounts
             analyticsTracker.track(VerificationSuccess(PANE))
-            navigationManager.navigate(NavigateToRoute(linkAccountPicker))
+            navigationManager.navigate(
+                NavigateToRoute(
+                    command = linkAccountPicker,
+                    referrer = Pane.NETWORKING_LINK_VERIFICATION
+                )
+            )
         }
     }
 

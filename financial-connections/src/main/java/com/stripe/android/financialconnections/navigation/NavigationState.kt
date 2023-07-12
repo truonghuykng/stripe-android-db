@@ -1,5 +1,6 @@
 package com.stripe.android.financialconnections.navigation
 
+import com.stripe.android.financialconnections.model.FinancialConnectionsSessionManifest.Pane
 import java.util.UUID
 
 /**
@@ -11,6 +12,8 @@ internal sealed class NavigationState {
 
     data class NavigateToRoute(
         val command: NavigationCommand,
+        val referrer: Pane? = null,
+        val params: Map<String, String?> = emptyMap(),
         val popCurrentFromBackStack: Boolean = false,
         val id: String = UUID.randomUUID().toString()
     ) : NavigationState()

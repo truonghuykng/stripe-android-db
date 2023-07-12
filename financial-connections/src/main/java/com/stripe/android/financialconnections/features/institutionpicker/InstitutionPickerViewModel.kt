@@ -136,7 +136,10 @@ internal class InstitutionPickerViewModel @Inject constructor(
             }
             // navigate to next step
             navigationManager.navigate(
-                NavigationState.NavigateToRoute(NavigationDirections.partnerAuth)
+                NavigationState.NavigateToRoute(
+                    command = NavigationDirections.partnerAuth,
+                    referrer = Pane.INSTITUTION_PICKER,
+                )
             )
         }.execute { this }
     }
@@ -167,7 +170,10 @@ internal class InstitutionPickerViewModel @Inject constructor(
 
     fun onManualEntryClick() {
         navigationManager.navigate(
-            NavigationState.NavigateToRoute(NavigationDirections.manualEntry)
+            NavigationState.NavigateToRoute(
+                command = NavigationDirections.manualEntry,
+                referrer = Pane.INSTITUTION_PICKER,
+            )
         )
     }
 

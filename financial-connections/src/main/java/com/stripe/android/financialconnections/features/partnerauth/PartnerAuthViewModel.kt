@@ -33,7 +33,7 @@ import com.stripe.android.financialconnections.navigation.NavigationDirections.a
 import com.stripe.android.financialconnections.navigation.NavigationDirections.manualEntry
 import com.stripe.android.financialconnections.navigation.NavigationManager
 import com.stripe.android.financialconnections.navigation.NavigationState.NavigateToRoute
-import com.stripe.android.financialconnections.navigation.toNavigationCommand
+import com.stripe.android.financialconnections.navigation.toRoute
 import com.stripe.android.financialconnections.presentation.WebAuthFlowState
 import com.stripe.android.financialconnections.ui.FinancialConnectionsSheetNativeActivity
 import com.stripe.android.financialconnections.utils.UriUtils
@@ -165,6 +165,7 @@ internal class PartnerAuthViewModel @Inject constructor(
         navigationManager.navigate(
             NavigateToRoute(
                 command = NavigationDirections.reset,
+                referrer = Pane.PARTNER_AUTH,
                 popCurrentFromBackStack = true
             )
         )
@@ -228,7 +229,8 @@ internal class PartnerAuthViewModel @Inject constructor(
                 postAuthSessionEvent(authSession.id, AuthSessionEvent.Cancel(Date()))
                 navigationManager.navigate(
                     NavigateToRoute(
-                        command = result.nextPane.toNavigationCommand(),
+                        command = result.nextPane.toRoute(),
+                        referrer = Pane.PARTNER_AUTH,
                         popCurrentFromBackStack = true
                     )
                 )
@@ -255,7 +257,8 @@ internal class PartnerAuthViewModel @Inject constructor(
                 logger.debug("Session authorized!")
                 navigationManager.navigate(
                     NavigateToRoute(
-                        command = updatedSession.nextPane.toNavigationCommand(),
+                        command = updatedSession.nextPane.toRoute(),
+                        referrer = Pane.PARTNER_AUTH,
                         popCurrentFromBackStack = true
                     )
                 )
@@ -263,6 +266,7 @@ internal class PartnerAuthViewModel @Inject constructor(
                 navigationManager.navigate(
                     NavigateToRoute(
                         command = accountPicker,
+                        referrer = Pane.PARTNER_AUTH,
                         popCurrentFromBackStack = true
                     )
                 )
@@ -276,6 +280,7 @@ internal class PartnerAuthViewModel @Inject constructor(
     fun onEnterDetailsManuallyClick() = navigationManager.navigate(
         NavigateToRoute(
             command = manualEntry,
+            referrer = Pane.PARTNER_AUTH,
             popCurrentFromBackStack = true
         )
     )

@@ -74,7 +74,12 @@ internal class LinkStepUpVerificationViewModel @Inject constructor(
                 verificationType = VerificationType.EMAIL,
                 onConsumerNotFound = {
                     eventTracker.track(VerificationStepUpError(PANE, ConsumerNotFoundError))
-                    navigationManager.navigate(NavigateToRoute(institutionPicker))
+                    navigationManager.navigate(
+                        NavigateToRoute(
+                            command = institutionPicker,
+                            referrer = Pane.LINK_STEP_UP_VERIFICATION
+                        )
+                    )
                 },
                 onLookupError = { error ->
                     eventTracker.track(VerificationStepUpError(PANE, LookupConsumerSession))
@@ -151,7 +156,12 @@ internal class LinkStepUpVerificationViewModel @Inject constructor(
         updateLocalManifest { it.copy(activeInstitution = activeInstitution.data.firstOrNull()) }
         // Updates cached accounts with the one selected.
         updateCachedAccounts { listOf(selectedAccount) }
-        navigationManager.navigate(NavigateToRoute(success))
+        navigationManager.navigate(
+            NavigateToRoute(
+                command = success,
+                referrer = Pane.LINK_STEP_UP_VERIFICATION
+            )
+        )
     }.execute { copy(confirmVerification = it) }
 
     fun onClickableTextClick(text: String) {
@@ -173,7 +183,12 @@ internal class LinkStepUpVerificationViewModel @Inject constructor(
                 verificationType = VerificationType.EMAIL,
                 onConsumerNotFound = {
                     eventTracker.track(VerificationStepUpError(PANE, ConsumerNotFoundError))
-                    navigationManager.navigate(NavigateToRoute(institutionPicker))
+                    navigationManager.navigate(
+                        NavigateToRoute(
+                            command = institutionPicker,
+                            referrer = Pane.LINK_STEP_UP_VERIFICATION
+                        )
+                    )
                 },
                 onLookupError = { error ->
                     eventTracker.track(VerificationStepUpError(PANE, LookupConsumerSession))
