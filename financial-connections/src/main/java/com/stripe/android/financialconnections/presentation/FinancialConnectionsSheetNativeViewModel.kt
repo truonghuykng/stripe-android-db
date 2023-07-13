@@ -299,10 +299,13 @@ internal class FinancialConnectionsSheetNativeViewModel @Inject constructor(
         }
     }
 
-    fun onPaneLaunched(pane: Pane) {
+    fun onPaneLaunched(referrer: Pane?, pane: Pane) {
         viewModelScope.launch {
             eventTracker.track(
-                FinancialConnectionsEvent.PaneLaunched(pane)
+                FinancialConnectionsEvent.PaneLaunched(
+                    referrer = referrer,
+                    pane = pane
+                )
             )
         }
     }

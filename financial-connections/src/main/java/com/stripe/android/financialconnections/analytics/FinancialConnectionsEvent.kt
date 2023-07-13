@@ -17,10 +17,12 @@ internal sealed class FinancialConnectionsEvent(
     val eventName = if (includePrefix) "$EVENT_PREFIX.$name" else name
 
     class PaneLaunched(
+        referrer: Pane?,
         pane: Pane,
     ) : FinancialConnectionsEvent(
         "pane.launched",
         mapOf(
+            "referrer_pane" to referrer?.value,
             "pane" to pane.value,
         ).filterNotNullValues()
     )

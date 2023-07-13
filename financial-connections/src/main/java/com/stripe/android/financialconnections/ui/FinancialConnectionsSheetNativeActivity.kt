@@ -20,9 +20,9 @@ import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
+import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.airbnb.mvrx.MavericksView
 import com.airbnb.mvrx.compose.collectAsState
@@ -157,77 +157,77 @@ internal class FinancialConnectionsSheetNativeActivity : AppCompatActivity(), Ma
         ) {
             NavHost(navController, startDestination = initialDestination) {
                 NavigationDirections.consent.composable(this) {
-                    LaunchedPane(Pane.CONSENT)
+                    LaunchedPane(Pane.CONSENT, it)
                     BackHandler(navController, Pane.CONSENT)
                     ConsentScreen()
                 }
                 NavigationDirections.manualEntry.composable(this) {
-                    LaunchedPane(Pane.MANUAL_ENTRY)
+                    LaunchedPane(Pane.MANUAL_ENTRY, it)
                     BackHandler(navController, Pane.MANUAL_ENTRY)
                     ManualEntryScreen()
                 }
                 NavigationDirections.ManualEntrySuccess.composable(this) {
-                    LaunchedPane(Pane.MANUAL_ENTRY_SUCCESS)
+                    LaunchedPane(Pane.MANUAL_ENTRY_SUCCESS, it)
                     BackHandler(navController, Pane.MANUAL_ENTRY_SUCCESS)
                     ManualEntrySuccessScreen(it)
                 }
                 NavigationDirections.institutionPicker.composable(this) {
-                    LaunchedPane(Pane.INSTITUTION_PICKER)
+                    LaunchedPane(Pane.INSTITUTION_PICKER, it)
                     BackHandler(navController, Pane.INSTITUTION_PICKER)
                     InstitutionPickerScreen()
                 }
-                composable(NavigationDirections.partnerAuth.destination) {
-                    LaunchedPane(Pane.PARTNER_AUTH)
+                NavigationDirections.partnerAuth.composable(this) {
+                    LaunchedPane(Pane.PARTNER_AUTH, it)
                     BackHandler(navController, Pane.PARTNER_AUTH)
                     PartnerAuthScreen()
                 }
-                composable(NavigationDirections.accountPicker.destination) {
-                    LaunchedPane(Pane.ACCOUNT_PICKER)
+                NavigationDirections.accountPicker.composable(this) {
+                    LaunchedPane(Pane.ACCOUNT_PICKER, it)
                     BackHandler(navController, Pane.ACCOUNT_PICKER)
                     AccountPickerScreen()
                 }
-                composable(NavigationDirections.success.destination) {
-                    LaunchedPane(Pane.SUCCESS)
+                NavigationDirections.success.composable(this) {
+                    LaunchedPane(Pane.SUCCESS, it)
                     BackHandler(navController, Pane.SUCCESS)
                     SuccessScreen()
                 }
-                composable(NavigationDirections.reset.destination) {
-                    LaunchedPane(Pane.RESET)
+                NavigationDirections.reset.composable(this) {
+                    LaunchedPane(Pane.RESET, it)
                     BackHandler(navController, Pane.RESET)
                     ResetScreen()
                 }
-                composable(NavigationDirections.attachLinkedPaymentAccount.destination) {
-                    LaunchedPane(Pane.ATTACH_LINKED_PAYMENT_ACCOUNT)
+                NavigationDirections.attachLinkedPaymentAccount.composable(this) {
+                    LaunchedPane(Pane.ATTACH_LINKED_PAYMENT_ACCOUNT, it)
                     BackHandler(navController, Pane.ATTACH_LINKED_PAYMENT_ACCOUNT)
                     AttachPaymentScreen()
                 }
-                composable(NavigationDirections.networkingLinkSignup.destination) {
-                    LaunchedPane(Pane.NETWORKING_LINK_SIGNUP_PANE)
+                NavigationDirections.networkingLinkSignup.composable(this) {
+                    LaunchedPane(Pane.NETWORKING_LINK_SIGNUP_PANE, it)
                     BackHandler(navController, Pane.NETWORKING_LINK_SIGNUP_PANE)
                     NetworkingLinkSignupScreen()
                 }
-                composable(NavigationDirections.networkingLinkLoginWarmup.destination) {
-                    LaunchedPane(Pane.NETWORKING_LINK_LOGIN_WARMUP)
+                NavigationDirections.networkingLinkLoginWarmup.composable(this) {
+                    LaunchedPane(Pane.NETWORKING_LINK_LOGIN_WARMUP, it)
                     BackHandler(navController, Pane.NETWORKING_LINK_LOGIN_WARMUP)
                     NetworkingLinkLoginWarmupScreen()
                 }
-                composable(NavigationDirections.networkingLinkVerification.destination) {
-                    LaunchedPane(Pane.NETWORKING_LINK_VERIFICATION)
+                NavigationDirections.networkingLinkVerification.composable(this) {
+                    LaunchedPane(Pane.NETWORKING_LINK_VERIFICATION, it)
                     BackHandler(navController, Pane.NETWORKING_LINK_VERIFICATION)
                     NetworkingLinkVerificationScreen()
                 }
-                composable(NavigationDirections.networkingSaveToLinkVerification.destination) {
-                    LaunchedPane(Pane.NETWORKING_SAVE_TO_LINK_VERIFICATION)
+                NavigationDirections.networkingSaveToLinkVerification.composable(this) {
+                    LaunchedPane(Pane.NETWORKING_SAVE_TO_LINK_VERIFICATION, it)
                     BackHandler(navController, Pane.NETWORKING_SAVE_TO_LINK_VERIFICATION)
                     NetworkingSaveToLinkVerificationScreen()
                 }
-                composable(NavigationDirections.linkAccountPicker.destination) {
-                    LaunchedPane(Pane.LINK_ACCOUNT_PICKER)
+                NavigationDirections.linkAccountPicker.composable(this) {
+                    LaunchedPane(Pane.LINK_ACCOUNT_PICKER, it)
                     BackHandler(navController, Pane.LINK_ACCOUNT_PICKER)
                     LinkAccountPickerScreen()
                 }
-                composable(NavigationDirections.linkStepUpVerification.destination) {
-                    LaunchedPane(Pane.LINK_STEP_UP_VERIFICATION)
+                NavigationDirections.linkStepUpVerification.composable(this) {
+                    LaunchedPane(Pane.LINK_STEP_UP_VERIFICATION, it)
                     BackHandler(navController, Pane.LINK_STEP_UP_VERIFICATION)
                     LinkStepUpVerificationScreen()
                 }
@@ -245,9 +245,17 @@ internal class FinancialConnectionsSheetNativeActivity : AppCompatActivity(), Ma
 
     @Composable
     private fun LaunchedPane(
-        pane: Pane
+        pane: Pane,
+        navBackStackEntry: NavBackStackEntry
     ) {
-        LaunchedEffect(Unit) { viewModel.onPaneLaunched(pane) }
+        LaunchedEffect(Unit) {
+            viewModel.onPaneLaunched(
+                referrer = navBackStackEntry.arguments
+                    ?.getString("referrer_pane")
+                    ?.let { Pane.fromValue(it) },
+                pane = pane
+            )
+        }
     }
 
     /**

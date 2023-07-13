@@ -5,7 +5,6 @@ import androidx.navigation.NamedNavArgument
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavType
-import androidx.navigation.NavType.EnumType
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.stripe.android.financialconnections.model.FinancialConnectionsSessionManifest.Pane
@@ -16,9 +15,9 @@ internal interface NavigationCommand {
     val arguments: List<NamedNavArgument>
 
     val destination: String
-        get() = "$baseRoute?" + arguments.joinToString(separator = ",") { (key, value) ->
-            "$key={$value}"
-        }
+        get() = "$baseRoute?" + arguments
+            .map { it.name }
+            .joinToString(separator = ",") { name -> "$name={$name}" }
 
     fun composable(
         navGraphBuilder: NavGraphBuilder,
@@ -191,10 +190,8 @@ internal object NavigationDirections {
         override val baseRoute: String = "manual_entry_success"
 
         override val arguments = commonArguments() + listOf(
+            navArgument(KEY_MICRODEPOSITS) { type = NavType.StringType },
             navArgument(KEY_LAST4) { type = NavType.StringType },
-            navArgument(KEY_MICRODEPOSITS) {
-                type = EnumType(MicrodepositVerificationMethod::class.java)
-            }
         )
 
         override fun invoke(referrer: Pane?, params: Map<String, String?>): String {
