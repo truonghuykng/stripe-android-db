@@ -133,7 +133,6 @@ internal class LinkAccountPickerViewModel @Inject constructor(
 
             else -> selectAccount(payload, selectedAccount)
         }
-        Unit
     }.execute { copy(selectNetworkedAccountAsync = it) }
 
     private suspend fun repairAccount() {
