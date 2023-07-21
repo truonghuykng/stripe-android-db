@@ -18,6 +18,7 @@ import com.stripe.android.paymentsheet.PaymentSheet.InitializationMode.DeferredI
 import com.stripe.android.paymentsheet.PrefsRepository
 import com.stripe.android.paymentsheet.addresselement.AddressDetails
 import com.stripe.android.paymentsheet.addresselement.toIdentifierMap
+import com.stripe.android.paymentsheet.analytics.DurationProvider
 import com.stripe.android.paymentsheet.analytics.EventReporter
 import com.stripe.android.paymentsheet.model.PaymentSelection
 import com.stripe.android.paymentsheet.model.SavedSelection
@@ -33,6 +34,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
+import java.util.UUID
 import javax.inject.Inject
 import javax.inject.Named
 import javax.inject.Singleton
@@ -68,6 +70,7 @@ internal class DefaultPaymentSheetLoader @Inject constructor(
     private val eventReporter: EventReporter,
     @IOContext private val workContext: CoroutineContext,
     private val accountStatusProvider: LinkAccountStatusProvider,
+    private val durationProvider: DurationProvider,
 ) : PaymentSheetLoader {
 
     override suspend fun load(
@@ -75,11 +78,34 @@ internal class DefaultPaymentSheetLoader @Inject constructor(
         paymentSheetConfiguration: PaymentSheet.Configuration?
     ): PaymentSheetLoader.Result = withContext(workContext) {
         val isGooglePayReady = isGooglePayReady(paymentSheetConfiguration)
+        val isDecoupling = initializationMode is DeferredIntent
 
-        retrieveElementsSession(
+        val loadKey = UUID.randomUUID().toString()
+        durationProvider.start(loadKey)
+        eventReporter.onLoadStarted(isDecoupling = isDecoupling)
+
+        val elementsSessionResult = retrieveElementsSession(
             initializationMode = initializationMode,
             configuration = paymentSheetConfiguration,
-        ).fold(
+        )
+
+        val duration = durationProvider.end(loadKey)
+
+        elementsSessionResult.onSuccess {
+            eventReporter.onLoadSucceeded(
+                isDecoupling = isDecoupling,
+                duration = duration,
+            )
+        }.onFailure { error ->
+            logger.error("Failure initializing FlowController", error)
+            eventReporter.onLoadFailed(
+                isDecoupling = isDecoupling,
+                duration = duration,
+                error = error,
+            )
+        }
+
+        elementsSessionResult.fold(
             onSuccess = { elementsSession ->
                 create(
                     stripeIntent = elementsSession.stripeIntent,
@@ -90,7 +116,6 @@ internal class DefaultPaymentSheetLoader @Inject constructor(
                 )
             },
             onFailure = {
-                logger.error("Failure initializing FlowController", it)
                 PaymentSheetLoader.Result.Failure(it)
             }
         )

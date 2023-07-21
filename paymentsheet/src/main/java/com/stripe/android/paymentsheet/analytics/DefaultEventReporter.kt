@@ -35,12 +35,35 @@ internal class DefaultEventReporter @Inject internal constructor(
         )
     }
 
+    override fun onLoadStarted(isDecoupling: Boolean) {
+        fireEvent(PaymentSheetEvent.LoadStarted(isDecoupling))
+    }
+
+    override fun onLoadSucceeded(isDecoupling: Boolean, duration: Long?) {
+        fireEvent(
+            PaymentSheetEvent.LoadSucceeded(
+                duration = duration,
+                isDecoupled = isDecoupling,
+            )
+        )
+    }
+
+    override fun onLoadFailed(isDecoupling: Boolean, duration: Long?, error: Throwable) {
+        // TODO error_domain
+        fireEvent(
+            PaymentSheetEvent.LoadFailed(
+                duration = duration,
+                error = error,
+                isDecoupled = isDecoupling,
+            )
+        )
+    }
+
     override fun onDismiss(
         isDecoupling: Boolean,
     ) {
         fireEvent(
             PaymentSheetEvent.Dismiss(
-                mode = mode,
                 isDecoupled = isDecoupling,
             )
         )

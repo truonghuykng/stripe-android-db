@@ -11,6 +11,38 @@ import java.util.Locale
 internal sealed class PaymentSheetEvent : AnalyticsEvent {
     abstract val additionalParams: Map<String, Any?>
 
+    class LoadStarted(
+        isDecoupled: Boolean,
+    ) : PaymentSheetEvent() {
+        override val eventName: String = "mc_load_started"
+        override val additionalParams: Map<String, Any?> = mapOf(
+            FIELD_IS_DECOUPLED to isDecoupled,
+        )
+    }
+
+    class LoadSucceeded(
+        duration: Long?,
+        isDecoupled: Boolean,
+    ) : PaymentSheetEvent() {
+        override val eventName: String = "mc_load_succeeded"
+        override val additionalParams: Map<String, Any?> = mapOf(
+            "duration" to duration,
+            FIELD_IS_DECOUPLED to isDecoupled,
+        )
+    }
+
+    class LoadFailed(
+        duration: Long?,
+        error: Throwable, // TODO
+        isDecoupled: Boolean,
+    ) : PaymentSheetEvent() {
+        override val eventName: String = "mc_load_failed"
+        override val additionalParams: Map<String, Any?> = mapOf(
+            "duration" to duration,
+            FIELD_IS_DECOUPLED to isDecoupled,
+        )
+    }
+
     class Init(
         private val mode: EventReporter.Mode,
         private val configuration: PaymentSheet.Configuration?,
@@ -116,10 +148,9 @@ internal sealed class PaymentSheetEvent : AnalyticsEvent {
     }
 
     class Dismiss(
-        mode: EventReporter.Mode,
         isDecoupled: Boolean,
     ) : PaymentSheetEvent() {
-        override val eventName: String = formatEventName(mode, "dismiss")
+        override val eventName: String = "mc_dismiss"
         override val additionalParams: Map<String, Any> = mapOf(
             FIELD_IS_DECOUPLED to isDecoupled,
         )

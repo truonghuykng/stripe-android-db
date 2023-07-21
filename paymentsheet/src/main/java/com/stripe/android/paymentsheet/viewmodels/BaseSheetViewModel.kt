@@ -282,6 +282,11 @@ internal abstract class BaseSheetViewModel(
         }
     }
 
+    fun reportDismiss() {
+        val isDecoupling = stripeIntent.value?.clientSecret == null
+        eventReporter.onDismiss(isDecoupling = isDecoupling)
+    }
+
     abstract fun clearErrorMessages()
 
     fun updatePrimaryButtonForLinkSignup(viewState: InlineSignupViewState) {

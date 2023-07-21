@@ -108,6 +108,7 @@ internal abstract class BaseSheetActivity<ResultType> : AppCompatActivity() {
         result: ResultType
     ) {
         // TODO(mlb): Consider if this needs to be an abstract function
+        viewModel.reportDismiss()
         setActivityResult(result)
         bottomSheetController.hide()
     }

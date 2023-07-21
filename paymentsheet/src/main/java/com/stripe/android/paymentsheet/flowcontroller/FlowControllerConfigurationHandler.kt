@@ -76,6 +76,11 @@ internal class FlowControllerConfigurationHandler @Inject constructor(
             return
         }
 
+        eventReporter.onInit(
+            configuration = configuration,
+            isDecoupling = initializationMode is DeferredIntent,
+        )
+
         val configureRequest = ConfigureRequest(initializationMode, configuration)
         val canSkip = viewModel.previousConfigureRequest == configureRequest
 
@@ -88,7 +93,7 @@ internal class FlowControllerConfigurationHandler @Inject constructor(
         when (val result = paymentSheetLoader.load(initializationMode, configuration)) {
             is PaymentSheetLoader.Result.Success -> {
                 viewModel.previousConfigureRequest = configureRequest
-                onInitSuccess(result.state, configureRequest)
+                onInitSuccess(result.state)
                 onConfigured()
             }
             is PaymentSheetLoader.Result.Failure -> {
@@ -99,15 +104,7 @@ internal class FlowControllerConfigurationHandler @Inject constructor(
 
     private fun onInitSuccess(
         state: PaymentSheetState.Full,
-        configureRequest: ConfigureRequest,
     ) {
-        val isDecoupling = configureRequest.initializationMode is DeferredIntent
-
-        eventReporter.onInit(
-            configuration = state.config,
-            isDecoupling = isDecoupling,
-        )
-
         viewModel.paymentSelection = paymentSelectionUpdater(
             currentSelection = viewModel.paymentSelection,
             previousConfig = viewModel.state?.config,
