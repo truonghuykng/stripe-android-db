@@ -2,6 +2,17 @@
 
 ## XX.XX.XX - 2023-XX-XX
 
+### Payments
+*[CHANGED] The return type for several methods in `Stripe` has changed from `T?` (nullable) to `T` to better reflect possible behavior. These methods continue to be throwing and should be wrapped in a `try/catch` block.
+*[FIXED][6977](https://github.com/stripe/stripe-android/pull/6977) Fixed an issue where `Stripe.retrievePossibleBrands()` returned incorrect results. 
+
+## 20.27.2 - 2023-07-18
+
+### PaymentSheet
+* [FIXED] Fixed various bugs in Link private beta.
+
+## 20.27.1 - 2023-07-17
+
 ### PaymentSheet
 * [FIXED][6992](https://github.com/stripe/stripe-android/pull/6992) Fixed an issue where incorrect padding was set on the Google Pay button.
 

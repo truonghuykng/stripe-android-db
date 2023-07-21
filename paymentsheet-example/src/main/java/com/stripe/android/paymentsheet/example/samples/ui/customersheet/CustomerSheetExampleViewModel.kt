@@ -35,7 +35,13 @@ class CustomerSheetExampleViewModel(
     )
     val state: StateFlow<CustomerSheetExampleViewState> = _state
 
-    internal val customerAdapter: CustomerAdapter = CustomerAdapter.create(
+    private val _isSetupIntentEnabled = MutableStateFlow(true)
+    val isSetupIntentEnabled: StateFlow<Boolean> = _isSetupIntentEnabled
+
+    private val _isDeveloperModeEnabled = MutableStateFlow(false)
+    val isDeveloperModeEnabled: StateFlow<Boolean> = _isDeveloperModeEnabled
+
+    private val _customerAdapter: CustomerAdapter = CustomerAdapter.create(
         context = getApplication(),
         customerEphemeralKeyProvider = {
             fetchCustomerEphemeralKey().fold(
@@ -70,6 +76,10 @@ class CustomerSheetExampleViewModel(
                 }
             )
         },
+    )
+
+    internal val customerAdapter = CustomerSheetExampleAdapter(
+        _customerAdapter
     )
 
     init {
@@ -143,11 +153,51 @@ class CustomerSheetExampleViewModel(
     }
 
     fun onCustomerSheetResult(result: CustomerSheetResult) {
-        (state.value as? CustomerSheetExampleViewState.Data)?.let { state ->
-            _state.update {
-                state.copy(
-                    result = result
-                )
+        when (result) {
+            is CustomerSheetResult.Canceled -> {
+                updateDataViewState {
+                    it.copy(
+                        selection = result.selection,
+                        errorMessage = null,
+                    )
+                }
+            }
+            is CustomerSheetResult.Selected -> {
+                updateDataViewState {
+                    it.copy(
+                        selection = result.selection,
+                        errorMessage = null,
+                    )
+                }
+            }
+            is CustomerSheetResult.Error -> {
+                updateDataViewState {
+                    it.copy(
+                        selection = null,
+                        errorMessage = result.exception.message,
+                    )
+                }
+            }
+        }
+    }
+
+    fun toggleSetupIntentEnabled(isSetupIntentEnabled: Boolean) {
+        _isSetupIntentEnabled.update { isSetupIntentEnabled }
+        customerAdapter.overrideCanCreateSetupIntents = isSetupIntentEnabled
+    }
+
+    fun toggleDeveloperMode() {
+        _isDeveloperModeEnabled.update { !it }
+    }
+
+    private fun updateDataViewState(
+        transform: (CustomerSheetExampleViewState.Data) -> CustomerSheetExampleViewState.Data,
+    ) {
+        _state.update {
+            if (it is CustomerSheetExampleViewState.Data) {
+                transform(it)
+            } else {
+                it
             }
         }
     }
