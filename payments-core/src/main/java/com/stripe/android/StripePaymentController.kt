@@ -52,7 +52,7 @@ constructor(
     private val enableLogging: Boolean = false,
     workContext: CoroutineContext = Dispatchers.IO,
     private val analyticsRequestExecutor: AnalyticsRequestExecutor =
-        DefaultAnalyticsRequestExecutor(Logger.getInstance(enableLogging), workContext),
+        DefaultAnalyticsRequestExecutor(context, enableLogging, workContext),
     private val paymentAnalyticsRequestFactory: PaymentAnalyticsRequestFactory =
         PaymentAnalyticsRequestFactory(context.applicationContext, publishableKeyProvider),
     private val alipayRepository: AlipayRepository = DefaultAlipayRepository(stripeRepository),

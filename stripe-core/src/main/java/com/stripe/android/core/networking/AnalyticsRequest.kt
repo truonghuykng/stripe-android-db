@@ -1,6 +1,10 @@
 package com.stripe.android.core.networking
 
 import androidx.annotation.RestrictTo
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.encodeToJsonElement
 
 /**
  * Analytics request sent to q.stripe.com, which is a legacy analytics service used mostly by
@@ -10,8 +14,9 @@ import androidx.annotation.RestrictTo
  * this table through r.stripe.com. See [AnalyticsRequestV2] for details.
  */
 @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
-data class AnalyticsRequest(
-    val params: Map<String, *>,
+@Serializable
+data class AnalyticsRequest constructor(
+    val params: Map<String, String?>,
     override val headers: Map<String, String>
 ) : StripeRequest() {
     private val query: String = QueryStringFactory.createFromParamsWithEmptyValues(params)
@@ -27,7 +32,17 @@ data class AnalyticsRequest(
         query.takeIf { it.isNotEmpty() }
     ).joinToString("?")
 
+    internal fun toJson(): String? {
+        return runCatching { Json.encodeToJsonElement(this).toString() }.getOrNull()
+    }
+
     internal companion object {
         internal const val HOST = "https://q.stripe.com"
+
+        fun fromJson(json: String): AnalyticsRequest? {
+            return runCatching {
+                Json.decodeFromString<AnalyticsRequest>(json)
+            }.getOrNull()
+        }
     }
 }

@@ -121,7 +121,7 @@ internal class PaymentAuthWebViewActivityViewModel(
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             return PaymentAuthWebViewActivityViewModel(
                 args,
-                DefaultAnalyticsRequestExecutor(logger, Dispatchers.IO),
+                DefaultAnalyticsRequestExecutor(application, logger, Dispatchers.IO),
                 PaymentAnalyticsRequestFactory(
                     application,
                     args.publishableKey,

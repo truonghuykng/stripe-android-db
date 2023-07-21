@@ -5,11 +5,12 @@ import com.stripe.android.core.networking.AnalyticsEvent
 import com.stripe.android.paymentsheet.DeferredIntentConfirmationType
 import com.stripe.android.paymentsheet.PaymentSheet
 import com.stripe.android.paymentsheet.model.PaymentSelection
+import com.stripe.android.ui.core.elements.filterNotNullValues
 import com.stripe.android.uicore.StripeThemeDefaults
 import java.util.Locale
 
 internal sealed class PaymentSheetEvent : AnalyticsEvent {
-    abstract val additionalParams: Map<String, Any?>
+    abstract val additionalParams: Map<String, String>
 
     class Init(
         private val mode: EventReporter.Mode,
@@ -26,7 +27,7 @@ internal sealed class PaymentSheetEvent : AnalyticsEvent {
                 return formatEventName(mode, "init_$configValue")
             }
 
-        override val additionalParams: Map<String, Any?>
+        override val additionalParams: Map<String, String>
             get() {
                 val primaryButtonConfig = configuration?.appearance?.primaryButton
                 val primaryButtonConfigMap = mapOf(
@@ -108,8 +109,8 @@ internal sealed class PaymentSheetEvent : AnalyticsEvent {
                         billingDetailsCollectionConfigMap,
                 )
                 return mapOf(
-                    FIELD_MOBILE_PAYMENT_ELEMENT_CONFIGURATION to configurationMap,
-                    FIELD_IS_DECOUPLED to isDecoupled,
+                    FIELD_MOBILE_PAYMENT_ELEMENT_CONFIGURATION to configurationMap.toString(),
+                    FIELD_IS_DECOUPLED to isDecoupled.toString(),
                     "locale" to Locale.getDefault().toString()
                 )
             }
@@ -120,8 +121,8 @@ internal sealed class PaymentSheetEvent : AnalyticsEvent {
         isDecoupled: Boolean,
     ) : PaymentSheetEvent() {
         override val eventName: String = formatEventName(mode, "dismiss")
-        override val additionalParams: Map<String, Any> = mapOf(
-            FIELD_IS_DECOUPLED to isDecoupled,
+        override val additionalParams: Map<String, String> = mapOf(
+            FIELD_IS_DECOUPLED to isDecoupled.toString(),
         )
     }
 
@@ -132,12 +133,12 @@ internal sealed class PaymentSheetEvent : AnalyticsEvent {
         isDecoupled: Boolean,
     ) : PaymentSheetEvent() {
         override val eventName: String = formatEventName(mode, "sheet_newpm_show")
-        override val additionalParams: Map<String, Any?> = mapOf(
-            "link_enabled" to linkEnabled,
+        override val additionalParams: Map<String, String> = mapOf(
+            "link_enabled" to linkEnabled.toString(),
             "locale" to Locale.getDefault().toString(),
             "currency" to currency,
-            FIELD_IS_DECOUPLED to isDecoupled,
-        )
+            FIELD_IS_DECOUPLED to isDecoupled.toString(),
+        ).filterNotNullValues()
     }
 
     class ShowExistingPaymentOptions(
@@ -147,12 +148,12 @@ internal sealed class PaymentSheetEvent : AnalyticsEvent {
         isDecoupled: Boolean,
     ) : PaymentSheetEvent() {
         override val eventName: String = formatEventName(mode, "sheet_savedpm_show")
-        override val additionalParams: Map<String, Any?> = mapOf(
-            "link_enabled" to linkEnabled,
+        override val additionalParams: Map<String, String> = mapOf(
+            "link_enabled" to linkEnabled.toString(),
             "locale" to Locale.getDefault().toString(),
             "currency" to currency,
-            FIELD_IS_DECOUPLED to isDecoupled,
-        )
+            FIELD_IS_DECOUPLED to isDecoupled.toString(),
+        ).filterNotNullValues()
     }
 
     class SelectPaymentOption(
@@ -163,11 +164,11 @@ internal sealed class PaymentSheetEvent : AnalyticsEvent {
     ) : PaymentSheetEvent() {
         override val eventName: String =
             formatEventName(mode, "paymentoption_${analyticsValue(paymentSelection)}_select")
-        override val additionalParams: Map<String, Any?> = mapOf(
+        override val additionalParams: Map<String, String> = mapOf(
             "locale" to Locale.getDefault().toString(),
             "currency" to currency,
-            FIELD_IS_DECOUPLED to isDecoupled,
-        )
+            FIELD_IS_DECOUPLED to isDecoupled.toString(),
+        ).filterNotNullValues()
     }
 
     class Payment(
@@ -183,17 +184,17 @@ internal sealed class PaymentSheetEvent : AnalyticsEvent {
         override val eventName: String =
             formatEventName(mode, "payment_${analyticsValue(paymentSelection)}_$result")
 
-        override val additionalParams: Map<String, Any?> =
+        override val additionalParams: Map<String, String> =
             mapOf(
-                "duration" to durationMillis?.div(1000f),
+                "duration" to durationMillis?.div(1000f)?.toString(),
                 "locale" to Locale.getDefault().toString(),
                 "currency" to currency,
-                FIELD_IS_DECOUPLED to isDecoupled,
+                FIELD_IS_DECOUPLED to isDecoupled.toString(),
             ).plus(
                 deferredIntentConfirmationType?.let {
                     mapOf(FIELD_DEFERRED_INTENT_CONFIRMATION_TYPE to it.value)
                 }.orEmpty()
-            )
+            ).filterNotNullValues()
 
         enum class Result(private val code: String) {
             Success("success"),
@@ -208,8 +209,8 @@ internal sealed class PaymentSheetEvent : AnalyticsEvent {
         isDecoupled: Boolean,
     ) : PaymentSheetEvent() {
         override val eventName: String = "luxe_serialize_failure"
-        override val additionalParams: Map<String, Any?> = mapOf(
-            FIELD_IS_DECOUPLED to isDecoupled,
+        override val additionalParams: Map<String, String> = mapOf(
+            FIELD_IS_DECOUPLED to isDecoupled.toString(),
         )
     }
 
@@ -223,8 +224,8 @@ internal sealed class PaymentSheetEvent : AnalyticsEvent {
         ).lowercase()
 
         override val eventName: String = "autofill_${type.toSnakeCase()}"
-        override val additionalParams: Map<String, Any?> = mapOf(
-            FIELD_IS_DECOUPLED to isDecoupled,
+        override val additionalParams: Map<String, String> = mapOf(
+            FIELD_IS_DECOUPLED to isDecoupled.toString(),
         )
     }
 

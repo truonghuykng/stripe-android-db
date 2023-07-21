@@ -3,6 +3,7 @@ package com.stripe.android.financialconnections.di
 import android.app.Application
 import com.stripe.android.core.ApiVersion
 import com.stripe.android.core.Logger
+import com.stripe.android.core.injection.ENABLE_LOGGING
 import com.stripe.android.core.injection.IOContext
 import com.stripe.android.core.injection.STRIPE_ACCOUNT_ID
 import com.stripe.android.core.networking.AnalyticsRequestExecutor
@@ -117,8 +118,11 @@ internal object FinancialConnectionsSheetSharedModule {
     @Provides
     @Singleton
     internal fun providesAnalyticsRequestExecutor(
-        executor: DefaultAnalyticsRequestExecutor
-    ): AnalyticsRequestExecutor = executor
+        application: Application,
+        @Named(ENABLE_LOGGING) enableLogging: Boolean,
+    ): AnalyticsRequestExecutor {
+        return DefaultAnalyticsRequestExecutor(application, enableLogging)
+    }
 
     @Provides
     @Singleton

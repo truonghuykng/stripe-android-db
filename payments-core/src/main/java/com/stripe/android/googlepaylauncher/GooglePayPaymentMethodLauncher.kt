@@ -75,7 +75,7 @@ class GooglePayPaymentMethodLauncher @AssistedInject internal constructor(
         PaymentConfiguration.getInstance(context).publishableKey,
         setOf(PRODUCT_USAGE_TOKEN)
     ),
-    analyticsRequestExecutor: AnalyticsRequestExecutor = DefaultAnalyticsRequestExecutor(),
+    analyticsRequestExecutor: AnalyticsRequestExecutor = DefaultAnalyticsRequestExecutor(context),
     stripeRepository: StripeRepository = StripeApiRepository(
         context,
         publishableKeyProvider,
