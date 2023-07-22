@@ -64,7 +64,10 @@ internal class CustomerSheetViewModel @Inject constructor(
             .firstOrNull()
             ?.paymentSelection
 
-    private var originalPaymentSelection: PaymentSelection? = null
+    private var originalPaymentSelection: PaymentSelection? = backstack
+        .filterIsInstance<CustomerSheetViewState.SelectPaymentMethod>()
+        .firstOrNull()
+        ?.paymentSelection
 
     init {
         lpmRepository.initializeWithCardSpec(
@@ -252,7 +255,7 @@ internal class CustomerSheetViewModel @Inject constructor(
                             }
 
                             removedPaymentSelection
-                        },
+                        } ?: originalPaymentSelection,
                     )
                 }
             }.onFailure { cause, displayMessage ->
