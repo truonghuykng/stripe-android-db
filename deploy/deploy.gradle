@@ -56,10 +56,11 @@ afterEvaluate { project ->
                     name = project.artifactName
                     packaging = "aar"
                     description = project.artifactDescrption
-                    url = "https://github.com/stripe/stripe-android"
+//                    url = "https://github.com/stripe/stripe-android"
+                    url = "https://github.com/truonghuykng/stripe-android-db"
 
                     scm {
-                        url = "https://github.com/stripe/stripe-android"
+                        url = "https://github.com/truonghuykng/stripe-android-db"
                         connection = "scm:org-856813@github.com:stripe/stripe-android.git"
                         developerConnection = "scm:org-856813@github.com:stripe/stripe-android.git"
                     }
